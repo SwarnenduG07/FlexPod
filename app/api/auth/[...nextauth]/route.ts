@@ -1,5 +1,6 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from 'next-auth/providers/credentials';
+import bcrypt from "bcrypt";
 
 const handler = NextAuth({
   providers: [
@@ -11,8 +12,12 @@ const handler = NextAuth({
           OTP: { label: 'OTP', type: 'OTP', placeholder: 'Enter your Otp' },
         },
         async authorize(credentials) {
+            const hashedPassword = await bcrypt.hash(credentials?.password, 10);
+            const existingUser = await db.USer.findFirst({
+                
+            })
             console.log(credentials);
-            
+             
             return {
                 id: "user1"
             };
