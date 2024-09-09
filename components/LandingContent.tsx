@@ -19,7 +19,7 @@ const LandingContent = () => {
          </p>
          <div className='flex flex-col items-center mt-16 text-4xl md:text-5xl bg-gradient-to-tr text-transparent bg-clip-text from-purple-600 to-amber-400 font-semibold'>
                  Join Us To Make 100X Podcast with FluxPod
-                 <Button className='rounded-full mt-3' variant="outline">
+                 <Button className='rounded-full mt-4 transition ease-in-out delay-150  bg-gradient-to-tr text-black from-purple-600 to-rose-400 font-semibold hover:-translate-y-1 hover:scale-110  duration-300 border border-emerald-400' variant="outline">
                      Start Creating For Free
                  </Button>
         </div>
