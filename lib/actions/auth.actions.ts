@@ -29,8 +29,8 @@ export const authOptions = {
         password: { label: "Password", type: "password", required: true },
         otp: { label: "otp", type: "text", placeholder: "Enter the opt", required: true },
 
-
       },
+      
       async authorize(credentials: any) {
         // Validate credentials using Zod
         try {
