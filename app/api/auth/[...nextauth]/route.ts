@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
 import z from "zod";
+import { PrismaClient } from "@prisma/client";
 
 const client = new PrismaClient();
 
@@ -15,6 +15,7 @@ const passwordSchema = z.string().min(6).max(50).refine(
 const schema = z.object({
   email: z.string().email(),
   phone: z.string().min(10).max(15),
+  firstname: z.string().min(10).max(30),
   password: passwordSchema,
 });
 
@@ -33,6 +34,7 @@ export const authOptions = {
           schema.parse({
             email: credentials.email,
             phone: credentials.phone,
+            firstname: credentials.firstname,
             password: credentials.password,
           });
         } catch (e) {
@@ -53,11 +55,11 @@ export const authOptions = {
           if (passwordValidation) {
             return {
               id: existingUser.id.toString(),
-              name: existingUser.fristname,
+              firstname: existingUser.fristname,
               email: existingUser.email, // Should use email here
             };
           }
-          return null; // Incorrect password
+          return null; 
         }
 
         // Create new user
@@ -67,12 +69,13 @@ export const authOptions = {
               email: credentials.email, // Add email field
               number: credentials.phone,
               password: hashedPassword,
+              fristname: credentials.firstname,
             },
           });
 
           return {
             id: user.id.toString(),
-            name: user.name,
+            name: user.fristname,
             email: user.email,
           };
         } catch (e) {
