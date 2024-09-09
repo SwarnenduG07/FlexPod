@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 
 const client = new PrismaClient();
 
+// Password validation schema
 const passwordSchema = z.string().min(6).max(50).refine(
   (val) => /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,50}$/.test(val),
   {
@@ -12,10 +13,11 @@ const passwordSchema = z.string().min(6).max(50).refine(
   }
 );
 
+// General schema for credentials validation
 const schema = z.object({
   email: z.string().email(),
   phone: z.string().min(10).max(15),
-  firstname: z.string().min(10).max(30),
+  firstname: z.string().min(3).max(30), // Changed minlength to 3 for firstname
   password: passwordSchema,
 });
 
@@ -24,11 +26,11 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text", placeholder: "jhondoe@gmail.com" },
+        firstname: { label: "FirstName", type: "text", placeholder: "John Doe" }, // Corrected placeholder
+        email: { label: "Email", type: "text", placeholder: "johndoe@gmail.com" },
         phone: { label: "Phone number", type: "text", placeholder: "1231231231", required: true },
         password: { label: "Password", type: "password", required: true },
-        otp: { label: "otp", type: "text", placeholder: "Enter the opt", required: true },
-
+        otp: { label: "otp", type: "text", placeholder: "Enter the OTP", required: true },
       },
       
       async authorize(credentials: any) {
@@ -41,16 +43,13 @@ export const authOptions = {
             password: credentials.password,
           });
         } catch (e) {
-          // Handle Zod validation error
           console.error("Validation error:", e);
           throw new Error("Invalid credentials");
         }
 
-        const hashedPassword = await bcrypt.hash(credentials.password, 10);
+        // Check if user exists
         const existingUser = await client.user.findFirst({
-          where: {
-            email: credentials.email,
-          },
+          where: { email: credentials.email },
         });
 
         if (existingUser) {
@@ -58,31 +57,32 @@ export const authOptions = {
           if (passwordValidation) {
             return {
               id: existingUser.id.toString(),
-              firstname: existingUser.fristname,
-              email: existingUser.email, // Should use email here
+              firstname: existingUser.firstname, // Corrected typo here
+              email: existingUser.email,
             };
           }
-          return null; 
+          return null;
         }
 
-        // Create new user
+        // Create a new user
         try {
+          const hashedPassword = await bcrypt.hash(credentials.password, 10);
           const user = await client.user.create({
             data: {
-              email: credentials.email, // Add email field
-              number: credentials.phone,
+              email: credentials.email,
+              number: credentials.number,
               password: hashedPassword,
-              fristname: credentials.firstname,
+              firstname: credentials.firstname, // Corrected typo here
             },
           });
 
           return {
             id: user.id.toString(),
-            name: user.fristname,
+            name: user.firstname, // Corrected typo here
             email: user.email,
           };
         } catch (e) {
-          console.error(e);
+          console.error("Error creating user:", e);
           return null;
         }
       },
@@ -93,6 +93,10 @@ export const authOptions = {
     async session({ token, session }: { token: any; session: any }) {
       session.user.id = token.sub;
       return session;
+    },
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+      // Ensure the redirect URL is valid, or default to dashboard
+      return url.startsWith(baseUrl) ? url : baseUrl + "/dashboard";
     },
   },
 };
