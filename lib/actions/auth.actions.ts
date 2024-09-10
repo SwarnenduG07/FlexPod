@@ -16,7 +16,7 @@ const passwordSchema = z.string().min(6).max(50).refine(
 // General schema for credentials validation
 const schema = z.object({
   email: z.string().email(),
-  phone: z.string().min(10).max(15),
+  number: z.string().min(10).max(15),
   firstname: z.string().min(3).max(30), // Changed minlength to 3 for firstname
   password: passwordSchema,
 });
@@ -28,7 +28,7 @@ export const authOptions = {
       credentials: {
         firstname: { label: "FirstName", type: "text", placeholder: "John Doe" }, // Corrected placeholder
         email: { label: "Email", type: "text", placeholder: "johndoe@gmail.com" },
-        phone: { label: "Phone number", type: "text", placeholder: "1231231231", required: true },
+        number: { label: "Phone number", type: "text", placeholder: "1231231231", required: true },
         password: { label: "Password", type: "password", required: true },
         otp: { label: "otp", type: "text", placeholder: "Enter the OTP", required: true },
       },
@@ -38,7 +38,7 @@ export const authOptions = {
         try {
           schema.parse({
             email: credentials.email,
-            phone: credentials.phone,
+            number: credentials.number,
             firstname: credentials.firstname,
             password: credentials.password,
           });
