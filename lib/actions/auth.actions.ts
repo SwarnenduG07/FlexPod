@@ -2,6 +2,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import z from "zod";
 import { PrismaClient } from "@prisma/client";
+import { pages } from "next/dist/build/templates/app-page";
+import { signIn } from "next-auth/react";
 
 const client = new PrismaClient();
 
@@ -17,7 +19,7 @@ const passwordSchema = z.string().min(6).max(50).refine(
 const schema = z.object({
   email: z.string().email(),
   number: z.string().min(10).max(15),
-  firstname: z.string().min(3).max(30), // Changed minlength to 3 for firstname
+  firstname: z.string().min(3).max(30), 
   password: passwordSchema,
 });
 
@@ -26,7 +28,7 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        firstname: { label: "FirstName", type: "text", placeholder: "John Doe" }, // Corrected placeholder
+        firstname: { label: "FirstName", type: "text", placeholder: "John Doe" }, 
         email: { label: "Email", type: "text", placeholder: "johndoe@gmail.com" },
         number: { label: "Phone number", type: "text", placeholder: "1231231231", required: true },
         password: { label: "Password", type: "password", required: true },
@@ -43,7 +45,7 @@ export const authOptions = {
             password: credentials.password,
           });
         } catch (e) {
-          console.error("Validation error:", e);
+          console.error("Validation error: ", e);
           throw new Error("Invalid credentials");
         }
 
@@ -78,7 +80,7 @@ export const authOptions = {
 
           return {
             id: user.id.toString(),
-            name: user.firstname, // Corrected typo here
+            name: user.firstname, 
             email: user.email,
           };
         } catch (e) {
@@ -99,4 +101,7 @@ export const authOptions = {
       return url.startsWith(baseUrl) ? url : baseUrl + "/dashboard";
     },
   },
+  // pages: {
+  //   signIn: "/signin"
+  // }
 };
