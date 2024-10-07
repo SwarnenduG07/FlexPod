@@ -11,14 +11,13 @@ const client = new PrismaClient();
 const passwordSchema = z.string().min(6).max(50).refine(
   (val) => /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,50}$/.test(val),
   {
-    message: "Password must contain at least one uppercase letter, one number, and one special character",
+      message: "Password must contain at least one uppercase letter, one number, and one special character"
   }
 );
 
 // General schema for credentials validation
 const schema = z.object({
   email: z.string().email(),
-  number: z.string().min(10).max(15),
   firstname: z.string().min(3).max(30), 
   password: passwordSchema,
 });
@@ -30,7 +29,6 @@ export const authOptions = {
       credentials: {
         firstname: { label: "FirstName", type: "text", placeholder: "John Doe" }, 
         email: { label: "Email", type: "text", placeholder: "johndoe@gmail.com" },
-        number: { label: "Phone number", type: "text", placeholder: "1231231231", required: true },
         password: { label: "Password", type: "password", required: true },
         otp: { label: "otp", type: "text", placeholder: "Enter the OTP", required: true },
       },
@@ -40,7 +38,6 @@ export const authOptions = {
         try {
           schema.parse({
             email: credentials.email,
-            number: credentials.number,
             firstname: credentials.firstname,
             password: credentials.password,
           });
@@ -72,7 +69,6 @@ export const authOptions = {
           const user = await client.user.create({
             data: {
               email: credentials.email,
-              number: credentials.number,
               password: hashedPassword,
               firstname: credentials.firstname, // Corrected typo here
             },
@@ -97,7 +93,6 @@ export const authOptions = {
       return session;
     },
     async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
-      // Ensure the redirect URL is valid, or default to dashboard
       return url.startsWith(baseUrl) ? url : baseUrl + "/dashboard";
     },
   },
